@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from gooey import Gooey, GooeyParser
 import argparse
 import json
 from pathlib import Path
@@ -8,7 +8,7 @@ from typing import Iterable
 import cv2
 import numpy as np
 
-from apriltag_common_final import (
+from apriltag_common import (
     build_detector,
     grid_cell,
     laplacian_sharpness,
@@ -29,20 +29,20 @@ def per_view_reproj_error(objp, imgp, rvec, tvec, K, dist):
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Calibração intrínseca minuciosa com 1 ou mais vídeos locais usando AprilTag.")
-    p.add_argument("--video", nargs="+", required=True, help="Um ou mais caminhos de vídeo. Também aceita pasta.")
+    p = GooeyParser(description="Calibração intrínseca com um ou mais vídeos locais usando AprilTag.")
+    p.add_argument("--video", nargs="+", required=True, widget="MultiFileChooser",  help="Seleciona videos para calibração")
     p.add_argument("--out-dir", default="output_calib", help="Pasta de saída.")
     p.add_argument("--tag-family", default="tag36h11")
     p.add_argument("--tag-id", type=int, default=35)
-    p.add_argument("--tag-size-mm", type=float, default=28.0)
+    p.add_argument("--tag-size-mm", type=float, gooey_options={'min':0, 'max':150, 'increment':0.25}, default=28.0)
     p.add_argument("--process-every", type=int, default=1)
     p.add_argument("--max-frames", type=int, default=0, help="0 = sem limite por vídeo")
     p.add_argument("--print-every", type=int, default=100)
     p.add_argument("--min-sharp-abs", type=float, default=10.0)
     p.add_argument("--seed-views", type=int, default=30)
     p.add_argument("--seed-min-sharp", type=float, default=15.0)
-    p.add_argument("--seed-min-width-px", type=float, default=240.0)
-    p.add_argument("--min-tag-width-px", type=float, default=220.0)
+    p.add_argument("--seed-min-width-px", type=float, widget="IntegerField", gooey_options={"min":10, "max":240, "increment": 1}, default=240.0)
+    p.add_argument("--min-tag-width-px", type=float, widget="IntegerField", gooey_options={"min":10, "max":240, "increment": 1}, default=220.0)
     p.add_argument("--top-sharpness-keep", type=float, default=0.70)
     p.add_argument("--grid-n", type=int, default=3)
     p.add_argument("--per-cell-keep", type=int, default=120)
@@ -126,7 +126,11 @@ def _filter_seed_candidates(cands, W, H, min_sharp, min_width, center_margin, tr
         out.append(c)
     return out
 
-
+@Gooey(
+    program_name="Calibração LVA - AprilTag",
+    language='english',
+    default_size=(800, 700)
+)
 def main() -> None:
     args = parse_args()
     out_dir = Path(args.out_dir)

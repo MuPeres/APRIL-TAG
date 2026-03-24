@@ -10,7 +10,7 @@ import cv2
 import mss
 import numpy as np
 
-from apriltag_common_final import (
+from apriltag_common import (
     adjust_intrinsics,
     build_detector,
     compute_plane_angles,

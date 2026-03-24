@@ -1,0 +1,5 @@
+numpy
+opencv-contrib-python
+pupil-apriltags
+mss
+playwright

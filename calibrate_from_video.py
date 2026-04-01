@@ -338,7 +338,7 @@ def main() -> None:
     object_points_list = [objp.copy() for _ in selected]
     image_points_list = [c["imgp"].astype(np.float32).reshape(-1, 1, 2) for c in selected]
 
-    flags = cv2.CALIB_USE_INTRINSIC_GUESS | cv2.CALIB_ZERO_TANGENT_DIST
+    flags = cv2.CALIB_USE_INTRINSIC_GUESS | cv2.CALIB_ZERO_TANGENT_DIST | cv2.CALIB_FIX_PRINCIPAL_POINT
     if args.fix_k1:
         flags |= cv2.CALIB_FIX_K1
     if args.fix_k2:
@@ -348,11 +348,12 @@ def main() -> None:
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_COUNT, 120, 1e-10)
 
     def make_seed(obj_list, img_list):
-        K_seed = cv2.initCameraMatrix2D(obj_list, img_list, image_size, 0)
-        if not principal_point_valid(K_seed, image_size):
-            K_seed = K_seed.astype(np.float64)
-            K_seed[0, 2] = image_size[0] / 2.0
-            K_seed[1, 2] = image_size[1] / 2.0
+        K_seed = np.zeros((3, 3), dtype=np.float64)
+        K_seed[0, 0] = 1600.0  # Fx forçado de lente real
+        K_seed[1, 1] = 1600.0  # Fy forçado de lente real
+        K_seed[0, 2] = image_size[0] / 2.0
+        K_seed[1, 2] = image_size[1] / 2.0
+        K_seed[2, 2] = 1.0
         dist_seed = np.zeros((5, 1), dtype=np.float64)
         return K_seed, dist_seed
 

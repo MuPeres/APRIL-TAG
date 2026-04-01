@@ -34,7 +34,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--out-dir", default="output_calib", help="Pasta de saída.")
     p.add_argument("--tag-family", default="tag36h11")
     p.add_argument("--tag-id", type=int, default=35)
-    p.add_argument("--tag-size-mm", type=float, gooey_options={'min':0, 'max':150, 'increment':0.25}, default=28.0)
+    p.add_argument("--tag-size-mm", type=float, gooey_options={'min':0, 'max':150, 'increment':0.25}, default=45.0)
     p.add_argument("--process-every", type=int, default=1)
     p.add_argument("--max-frames", type=int, default=0, help="0 = sem limite por vídeo")
     p.add_argument("--print-every", type=int, default=100)
